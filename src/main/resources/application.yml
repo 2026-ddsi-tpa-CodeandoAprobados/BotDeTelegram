@@ -1,0 +1,51 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  cloud:
+    gateway:
+      default-filters:
+        - RemoveRequestHeader=Host
+        - RemoveRequestHeader=Forwarded
+        - RemoveRequestHeader=X-Forwarded-Host
+        - RemoveRequestHeader=X-Forwarded-Prefix
+        - RemoveRequestHeader=X-Forwarded-For
+        - RemoveRequestHeader=X-Forwarded-Proto
+        - RemoveRequestHeader=X-Forwarded-Port
+
+      routes:
+        # Donadores y Entidades
+        - id: donadoresYEntidades
+          uri: ${DONADORESYENTIDADES}
+          predicates:
+            - Path=/donadores/**, /entidades/**, /necesidades/**
+            - Method=GET,POST,DELETE,PATCH
+          filters:
+            - AddRequestHeader=X-Gateway-Request, true
+
+        # Donaciones
+        - id: donaciones
+          uri: ${DONACIONES}
+          predicates:
+            - Path=/donaciones/**, /productos/**, /categorias/**, /identificadores/**
+            - Method=GET,POST,DELETE,PATCH
+          filters:
+            - AddRequestHeader=X-Gateway-Request, true
+
+        # Logística
+        - id: logistica
+          uri: ${LOGISTICA}
+          predicates:
+            - Path=/depositos/**, /asignaciones/**, /entregas/**
+            - Method=GET,POST
+          filters:
+            - AddRequestHeader=X-Gateway-Request, true
+
+        # Incentivos
+        - id: incentivos
+          uri: ${INCENTIVOS}
+          predicates:
+            - Path=/insignias/**, /misiones/**
+            - Method=GET,POST
+          filters:
+            - AddRequestHeader=X-Gateway-Request, true
