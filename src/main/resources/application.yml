@@ -16,7 +16,7 @@ spring:
       routes:
         # Donadores y Entidades
         - id: donadoresYEntidades
-          uri: ${DONADORESYENTIDADES}
+          uri: ${DONADORESYENTIDADES_API_URL}
           predicates:
             - Path=/donadores/**, /entidades/**, /necesidades/**
             - Method=GET,POST,DELETE,PATCH
@@ -25,7 +25,7 @@ spring:
 
         # Donaciones
         - id: donaciones
-          uri: ${DONACIONES}
+          uri: ${DONACIONES_API_URL}
           predicates:
             - Path=/donaciones/**, /productos/**, /categorias/**, /identificadores/**
             - Method=GET,POST,DELETE,PATCH
@@ -34,7 +34,7 @@ spring:
 
         # Logística
         - id: logistica
-          uri: ${LOGISTICA}
+          uri: ${LOGISTICA_API_URL}
           predicates:
             - Path=/depositos/**, /asignaciones/**, /entregas/**
             - Method=GET,POST
@@ -43,7 +43,7 @@ spring:
 
         # Incentivos
         - id: incentivos
-          uri: ${INCENTIVOS}
+          uri: ${INCENTIVOS_API_URL}
           predicates:
             - Path=/insignias/**, /misiones/**
             - Method=GET,POST
