@@ -13,7 +13,7 @@ public class ApiExternaService {
 
     private final RestClient restClient;
 
-    public ApiExternaService(@Value("${DONADORESYENTIDADES}") String baseUrl) {
+    public ApiExternaService(@Value("${DONADORESYENTIDADES_API_URL}") String baseUrl) {
         this.restClient = RestClient.builder()
                 .baseUrl(baseUrl)
                 .build();
