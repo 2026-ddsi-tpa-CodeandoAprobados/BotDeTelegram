@@ -1,6 +1,8 @@
 package ar.edu.utn.dds.k3003.service;
 
 import ar.edu.utn.dds.k3003.catedra.dtos.donaciones.EstadoDonacionEnum;
+import ar.edu.utn.dds.k3003.catedra.dtos.logistica.PaqueteDTO;
+import ar.edu.utn.dds.k3003.catedra.dtos.logistica.TipoAlgoritmoEnum;
 import ar.edu.utn.dds.k3003.clients.DonacionesClient;
 import ar.edu.utn.dds.k3003.clients.DonadoresYEntidadesClient;
 import ar.edu.utn.dds.k3003.clients.IncentivosClient;
@@ -14,6 +16,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
+
+import java.util.List;
 
 @Component
 public class Grupo7Bot extends TelegramLongPollingBot {
@@ -60,71 +64,63 @@ public class Grupo7Bot extends TelegramLongPollingBot {
     }
 
     private String procesarComando(String comando) {
-        if (comando.equals("/start")) {
-            return " Bienvenido al sistema! ¿Qué tipo de usuario sos?\n " +
-                    "/donadores\n" +
-                    "/donaciones\n" +
-                    "/logistica\n" +
-                    "/incentivos\n" +
-                    "/Admin";
-        }
+        switch (comando) {
+            case "/start" -> {
+                return "Bienvenido al sistema! ¿Qué tipo de usuario sos?\n" +
+                        "/donadores - Alta\n" +
+                        "/donaciones - Alta\n" +
+                        "/logistica - Alta\n" +
+                        "/incentivos - Alta\n" +
+                        "/Admin - Baja y Modificacion";
+            }
+            case "/donadores" -> {
+                return "Opciones de Donador (Ingresá el comando para ejecutar):\n" +
+                        "/registro - Registrarse\n" +
+                        "/mis_estadisticas [ID] - Consultar sus estadísticas\n" +
+                        "/consultar_donadores - Ver todos los donadores\n" +
+                        "/consultar_donador_id [ID] - Buscar donador por ID";
+            }
+            case "/donaciones" -> {
+                return "Opciones de Donaciones (Ingresá el comando para ejecutar):\n" +
+                        "/registro - Registrar una donacion\n" +
+                        "/consultar_donaciones - Ver todas las donaciones\n" +
+                        "/consultar_donacion_id [ID] - Buscar una donacion por ID";
+            }
+            case "/logistica" -> {
+                return "Opciones de Logistica (Ingresá el comando para ejecutar):\n" +
+                        "/crear_deposito - Crear un deposito\n" +
+                        "/consultar_depositos - Ver todas los depositos\n" +
+                        "/consultar_deposito_id [ID] - Buscar un deposito por ID";
+            }
+            case "/incentivos" -> {
+                return "Opciones de Incentivos (Ingresá el comando para ejecutar):\n" +
+                        "/crear_insignia - Crear una insignia\n" +
+                        "/consultar_insignias - Ver todas las insignias\n" +
+                        "/consultar_insignia_id - Buscar una insignia por ID";
+            }
+            case "/Admin" -> {
+                return "Opciones de Admin (Ingresá el comando para ejecutar):\n" +
 
-        if (comando.equals("/donadores")) {
-            return "Opciones de Donador (Ingresá el comando para ejecutar):\n" +
-                    "/registro - Registrarse\n" +
-                    "/mis_estadisticas [ID] - Consultar sus estadísticas\n" +
-                    "/consultar_donadores - Ver todos los donadores\n" +
-                    "/consultar_donador_id [ID] - Buscar donador por ID";
-        }
+                        //DONADORES Y ENTIDADES
+                        "/crear_entidad - Crear una entidad\n" +
+                        "/editar_entidad - Editar razon social de una entidad\n" +
+                        "/consultar_entidades - Ver todas las entidades\n" +
+                        "/consultar_entidad_id [ID] - Buscar entidad por ID\n" +
+                        "/alta_necesidad - Alta de una necesidad\n" +
+                        "/borrar_necesidad [ID] - Borrar necesidad\n" +
+                        "/modificar_necesidad - Modificar la cantidad objetivo de una necesidad\n" +
+                        "/consultar_necesidades - Ver todas las necesidades\n" +
+                        "/consultar_necesidad [ID] - Ver todas las necesidad de un producto\n" +
 
-        if (comando.equals("/donaciones")) {
-            return "Opciones de Donaciones (Ingresá el comando para ejecutar):\n" +
-                    "/registro - Registrar una donacion\n" +
-                    "/consultar_donaciones - Ver todas las donaciones\n" +
-                    "/consultar_donacion_id [ID] - Buscar una donacion por ID";
+                        //DONACIONES
+                        "/modificar_donaciones [ID] - Modificar el estado de una donacion\n" +
 
-        }
+                        //LOGISTICA
+                        "/modificar_algoritmo [ID] - Modificar el algoritmo de un deposito\n"
 
-        if (comando.equals("/logistica")) {
-            return "Opciones de Logistica (Ingresá el comando para ejecutar):\n" +
-                    "/" +
-                    "/" +
-                    "/";
-        }
-
-        if (comando.equals("/incentivos")) {
-            return "Opciones de Incentivos (Ingresá el comando para ejecutar):\n" +
-                    "/" +
-                    "/" +
-                    "/";
-
-        }
-
-        if (comando.equals("/Admin")) {
-            return "Opciones de Admin (Ingresá el comando para ejecutar):\n" +
-
-                    //DONADORES Y ENTIDADES
-                    "/crear_entidad - Crear una entidad\n" +
-                    "/editar_entidad - Editar razon social de una entidad\n" +
-                    "/consultar_entidades - Ver todas las entidades\n" +
-                    "/consultar_entidad_id [ID] - Buscar entidad por ID\n" +
-                    "/alta_necesidad - Alta de una necesidad\n" +
-                    "/borrar_necesidad [ID] - Borrar necesidad\n" +
-                    "/modificar_necesidad - Modificar la cantidad objetivo de una necesidad\n" +
-                    "/consultar_necesidades - Ver todas las necesidades\n" +
-                    "/consultar_necesidad [ID] - Ver todas las necesidad de un producto\n" +
-
-                    //DONACIONES
-                    "/alta_producto" +
-                    "/crear_categoria" +
-                    "/crear_subcategoria" +
-                    "/modificar_donaciones [ID] - Modificar el estado de una donacion"
-
-                    //LOGISTICA
-
-
-                    //INCENTIVOS
-                    ;
+                        //INCENTIVOS
+                        ;
+            }
         }
 
         if (comando.startsWith("/registro")) {
@@ -351,6 +347,54 @@ public class Grupo7Bot extends TelegramLongPollingBot {
 
         if (comando.startsWith("/consultar_insignias")){
             return incentivosClient.consultarTodasLasInsignias();
+        }
+
+        if (comando.startsWith("/crear_deposito")) {
+            String datosCrudos = comando.replace("/crear_deposito", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para crear un deposti, enviá los datos separados por coma.\n" +
+                        "Ejemplo: `/crear_deposito , , , , , `";
+            }
+            String[] datos = datosCrudos.split(",");
+
+            try {
+                return logisticaClient.crearDeposito(TipoAlgoritmoEnum.valueOf(datos[0].trim()),
+                        datos[1].trim(),
+                        datos[2].trim(),
+                        Integer.parseInt(datos[3].trim())
+                );
+            } catch (NumberFormatException e) {
+                return "Faltan o sobran datos. Asegurate de enviar los 4 datos separados por comas";
+            }
+        }
+
+        if (comando.startsWith("/consultar_deposito_id")) {
+            String[] datos = comando.split(" ",2);
+            try {
+                return logisticaClient.consultarDepositoPorID(datos[1].trim());
+            } catch (NumberFormatException e){
+                return "Comando incompleto. Usa el formato: /consultar_deposito_id [ID]";
+            }
+        }
+
+        if (comando.startsWith("/consultar_deposito")){
+            return logisticaClient.consultarTodosLosDepositos();
+        }
+
+        if(comando.startsWith("/modificar_algoritmo")){
+            String datosCrudos = comando.replace("/modificar_algoritmo", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para modificar el algoritmo de un deposito, enviá el ID y el nuevo algoritmo separados por coma.\n" +
+                        "Ejemplo: /modificar_algoritmo ID, Algoritmo";
+            }
+            String[] datos = datosCrudos.split(",",2);
+            try{
+                return logisticaClient.modificarAlgoritmo(datos[0].trim(), TipoAlgoritmoEnum.valueOf(datos[1].trim()));
+            } catch (NumberFormatException e) {
+                return "Comando incompleto. Usa el formato: /modificar_algoritmo [ID]";
+            }
         }
 
         return "Comando no reconocido. Usá /start para ver el menú inicial.";
