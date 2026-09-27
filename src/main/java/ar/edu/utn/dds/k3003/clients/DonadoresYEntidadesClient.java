@@ -9,11 +9,11 @@ import org.springframework.web.client.RestClient;
 import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.*;
 
 @Service
-public class ApiExternaService {
+public class DonadoresYEntidadesClient {
 
     private final RestClient restClient;
 
-    public ApiExternaService(@Value("${DONADORESYENTIDADES_API_URL}") String baseUrl) {
+    public DonadoresYEntidadesClient(@Value("${DONADORESYENTIDADES_API_URL}") String baseUrl) {
         this.restClient = RestClient.builder()
                 .baseUrl(baseUrl)
                 .build();

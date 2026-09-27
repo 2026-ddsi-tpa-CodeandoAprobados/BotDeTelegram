@@ -1,6 +1,6 @@
 package ar.edu.utn.dds.k3003.service;
 
-import ar.edu.utn.dds.k3003.clients.ApiExternaService;
+import ar.edu.utn.dds.k3003.clients.DonadoresYEntidadesClient;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 @Component
 public class Grupo7Bot extends TelegramLongPollingBot {
 
-    private final ApiExternaService apiService;
+    private final DonadoresYEntidadesClient donadoresYEntidadesClient;
 
     @Value("${TOKEN_BOT}")
     private String botToken;
@@ -22,8 +22,8 @@ public class Grupo7Bot extends TelegramLongPollingBot {
     @Value("${NAME_BOT}")
     private String botUsername;
 
-    public Grupo7Bot(ApiExternaService apiService) {
-        this.apiService = apiService;
+    public Grupo7Bot(DonadoresYEntidadesClient donadoresYEntidadesClient) {
+        this.donadoresYEntidadesClient = donadoresYEntidadesClient;
     }
 
     @PostConstruct
@@ -31,7 +31,6 @@ public class Grupo7Bot extends TelegramLongPollingBot {
         try {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             telegramBotsApi.registerBot(this);
-            System.out.println("¡Bot registrado exitosamente en Telegram!");
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
@@ -60,17 +59,43 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                     "/consultar_donador_id [ID] - Buscar donador por ID";
         }
 
+        if (comando.equals("/donaciones")) {
+            return "Opciones de Donaciones (Ingresá el comando para ejecutar):\n" +
+                    "/registro - Registrar una donacion\n" +
+                    "/consultar_donaciones - Ver todas las donaciones\n" +
+                    "/consultar_donacion_id [ID] - Buscar una donacion por ID";
+
+        }
+
+        if (comando.equals("/logisitica")) {
+            return "Opciones de Logistica (Ingresá el comando para ejecutar):\n" +
+                    "/" +
+                    "/" +
+                    "/";
+        }
+
+        if (comando.equals("/incentivos")) {
+            return "Opciones de Incentivos (Ingresá el comando para ejecutar):\n" +
+                    "/" +
+                    "/" +
+                    "/";
+
+        }
+
         if (comando.equals("/Admin")) {
             return "Opciones de Admin (Ingresá el comando para ejecutar):\n" +
                     "/crear_entidad - Crear una entidad\n" +
-                    "/editar_entidad - Editar una entidad\n" +
+                    "/editar_entidad - Editar razon social de una entidad\n" +
                     "/consultar_entidades - Ver todas las entidades\n" +
                     "/consultar_entidad_id [ID] - Buscar entidad por ID\n" +
                     "/alta_necesidad - Alta de una necesidad\n" +
                     "/borrar_necesidad [ID] - Borrar necesidad\n" +
-                    "/modificar_necesidad - Modificar necesidad\n" +
+                    "/modificar_necesidad - Modificar la cantidad objetivo de una necesidad\n" +
                     "/consultar_necesidades - Ver todas las necesidades\n" +
-                    "/consultar_necesidad [ID] - Ver todas las necesidad de un producto";
+                    "/consultar_necesidad [ID] - Ver todas las necesidad de un producto\n" +
+
+                    "/modificar_donaciones [ID] - Modificar el estado de una donacion"
+                    ;
         }
 
         if (comando.startsWith("/registro")) {
@@ -83,7 +108,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
             String[] datos = datosCrudos.split(",");
 
             try {
-                return apiService.registrarDonador(datos[0].trim(),
+                return donadoresYEntidadesClient.registrarDonador(datos[0].trim(),
                             datos[1].trim(),
                             Integer.parseInt(datos[2].trim()),
                             datos[3].trim(),
@@ -97,20 +122,20 @@ public class Grupo7Bot extends TelegramLongPollingBot {
         if (comando.startsWith("/consultar_donador_id")) {
             String[] datos = comando.split(" ",2);
             try {
-                return apiService.consultarDonadorPorID(datos[1].trim());
+                return donadoresYEntidadesClient.consultarDonadorPorID(datos[1].trim());
             } catch (NumberFormatException e){
                 return "Comando incompleto. Usa el formato: /consultar_donador_id [ID]";
             }
         }
 
         if (comando.startsWith("/consultar_donadores")){
-            return apiService.consultarTodosLosDonadores();
+            return donadoresYEntidadesClient.consultarTodosLosDonadores();
         }
 
         if (comando.startsWith("/mis_estadisticas")) {
             String[] datos = comando.split(" ",2);
             try {
-                return apiService.consultarEstadisticasDeUnDonador(datos[1].trim());
+                return donadoresYEntidadesClient.consultarEstadisticasDeUnDonador(datos[1].trim());
             } catch (NumberFormatException e) {
                 return "Comando incompleto. Usa el formato: /mis_estadisticas [ID]";
             }
@@ -126,7 +151,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
             String[] datos = datosCrudos.split(",",4);
 
             try {
-                return apiService.crearEntidad(datos[0].trim(),
+                return donadoresYEntidadesClient.crearEntidad(datos[0].trim(),
                             datos[1].trim(),
                             datos[2].trim(),
                             datos[3].trim());
@@ -143,20 +168,20 @@ public class Grupo7Bot extends TelegramLongPollingBot {
             }
             String[] datos = datosCrudos.split(",",2);
             try{
-                return apiService.editarEntidad(datos[0].trim(), datos[1].trim());
+                return donadoresYEntidadesClient.editarEntidad(datos[0].trim(), datos[1].trim());
             } catch (NumberFormatException e) {
                 return "Comando incompleto. Usa el formato: /editar_entidad [ID]";
             }
         }
 
         if(comando.startsWith("/consultar_entidades")){
-            return apiService.consultarTodasLasEntidades();
+            return donadoresYEntidadesClient.consultarTodasLasEntidades();
         }
 
         if (comando.startsWith("/consultar_entidad_id")) {
             String[] datos = comando.split(" ",2);
             try {
-                return apiService.consultarEntidadPorID(datos[1].trim());
+                return donadoresYEntidadesClient.consultarEntidadPorID(datos[1].trim());
             } catch (NumberFormatException e){
                 return "Comando incompleto. Usa el formato: /consultar_donador_id [ID]";
             }
@@ -172,7 +197,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
             String[] datos = datosCrudos.split(",",5);
 
             try {
-                return apiService.altaNecesidad(
+                return donadoresYEntidadesClient.altaNecesidad(
                         datos[0].trim(),
                         Integer.parseInt(datos[1].trim()),
                         datos[2].trim(),
@@ -187,7 +212,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
         if(comando.startsWith("/borrar_necesidad")){
             String[] datos = comando.split(" ",2);
             try {
-                return apiService.borrarNecesidad(datos[1].trim());
+                return donadoresYEntidadesClient.borrarNecesidad(datos[1].trim());
             } catch (NumberFormatException e){
                 return "Comando incompleto. Usa el formato: /borrar_necesidad [ID]";
             }
@@ -197,25 +222,25 @@ public class Grupo7Bot extends TelegramLongPollingBot {
             String datosCrudos = comando.replace("/modificar_necesidad", "").trim();
 
             if (datosCrudos.isEmpty()) {
-                return "Para modificar una necesidad, enviá el ID y *** separados por coma.\n" +
-                        "Ejemplo: /modificar_necesidad ID, ***";
+                return "Para modificar una necesidad, enviá el ID y la nueva cantidad objetivo separados por coma.\n" +
+                        "Ejemplo: /modificar_necesidad ID, Cantidad objetivo";
             }
             String[] datos = datosCrudos.split(",",2);
             try{
-                return apiService.modificarNecesidad(datos[0].trim(), Integer.parseInt(datos[1].trim()));
+                return donadoresYEntidadesClient.modificarNecesidad(datos[0].trim(), Integer.parseInt(datos[1].trim()));
             } catch (NumberFormatException e) {
                 return "Comando incompleto. Usa el formato: /modificar_necesidad [ID]";
             }
         }
 
         if (comando.startsWith("/consultar_necesidades")){
-            return apiService.consultarTodasLasNecesidades();
+            return donadoresYEntidadesClient.consultarTodasLasNecesidades();
         }
 
         if(comando.startsWith("/consultar_necesidad")) {
             String[] datos = comando.split(" ",2);
             try {
-                return apiService.consultarNecesidadPorID(datos[1].trim());
+                return donadoresYEntidadesClient.consultarNecesidadPorID(datos[1].trim());
             } catch (NumberFormatException e){
                 return "Comando incompleto. Usa el formato: /consultar_necesidad [ID]";
             }
