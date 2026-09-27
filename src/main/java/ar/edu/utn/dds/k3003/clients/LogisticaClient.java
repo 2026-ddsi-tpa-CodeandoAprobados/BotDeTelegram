@@ -1,8 +1,10 @@
 package ar.edu.utn.dds.k3003.clients;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+@Service
 public class LogisticaClient {
     private final RestClient restClient;
 

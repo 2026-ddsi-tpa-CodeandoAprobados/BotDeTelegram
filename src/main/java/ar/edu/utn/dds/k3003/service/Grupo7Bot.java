@@ -1,6 +1,10 @@
 package ar.edu.utn.dds.k3003.service;
 
+import ar.edu.utn.dds.k3003.catedra.dtos.donaciones.EstadoDonacionEnum;
+import ar.edu.utn.dds.k3003.clients.DonacionesClient;
 import ar.edu.utn.dds.k3003.clients.DonadoresYEntidadesClient;
+import ar.edu.utn.dds.k3003.clients.IncentivosClient;
+import ar.edu.utn.dds.k3003.clients.LogisticaClient;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,6 +19,9 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 public class Grupo7Bot extends TelegramLongPollingBot {
 
     private final DonadoresYEntidadesClient donadoresYEntidadesClient;
+    private final DonacionesClient donacionesClient;
+    private final LogisticaClient logisticaClient;
+    private final IncentivosClient incentivosClient;
 
     @Value("${TOKEN_BOT}")
     private String botToken;
@@ -22,8 +29,14 @@ public class Grupo7Bot extends TelegramLongPollingBot {
     @Value("${NAME_BOT}")
     private String botUsername;
 
-    public Grupo7Bot(DonadoresYEntidadesClient donadoresYEntidadesClient) {
+    public Grupo7Bot(DonadoresYEntidadesClient donadoresYEntidadesClient,
+                     DonacionesClient donacionesClient,
+                     LogisticaClient logisticaClient,
+                     IncentivosClient incentivosClient) {
         this.donadoresYEntidadesClient = donadoresYEntidadesClient;
+        this.donacionesClient = donacionesClient;
+        this.logisticaClient = logisticaClient;
+        this.incentivosClient = incentivosClient;
     }
 
     @PostConstruct
@@ -84,6 +97,8 @@ public class Grupo7Bot extends TelegramLongPollingBot {
 
         if (comando.equals("/Admin")) {
             return "Opciones de Admin (Ingresá el comando para ejecutar):\n" +
+
+                    //DONADORES Y ENTIDADES
                     "/crear_entidad - Crear una entidad\n" +
                     "/editar_entidad - Editar razon social de una entidad\n" +
                     "/consultar_entidades - Ver todas las entidades\n" +
@@ -94,7 +109,16 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                     "/consultar_necesidades - Ver todas las necesidades\n" +
                     "/consultar_necesidad [ID] - Ver todas las necesidad de un producto\n" +
 
+                    //DONACIONES
+                    "/alta_producto" +
+                    "/crear_categoria" +
+                    "/crear_subcategoria" +
                     "/modificar_donaciones [ID] - Modificar el estado de una donacion"
+
+                    //LOGISTICA
+
+
+                    //INCENTIVOS
                     ;
         }
 
@@ -245,6 +269,57 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                 return "Comando incompleto. Usa el formato: /consultar_necesidad [ID]";
             }
         }
+
+        if (comando.startsWith("/registrar_donacion")) {
+            String datosCrudos = comando.replace("/registrar_donacion", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para crear una donacion, enviá los datos separados por coma.\n" +
+                        "Ejemplo: `/registrar_donacion , , , , , `";
+            }
+            String[] datos = datosCrudos.split(",");
+
+            try {
+                return donacionesClient.registrarDonacion(datos[0].trim(),
+                        datos[1].trim(),
+                        datos[2].trim(),
+                        datos[3].trim(),
+                        Integer.parseInt(datos[4].trim()),
+                        EstadoDonacionEnum.valueOf(datos[5].trim()));
+            } catch (NumberFormatException e) {
+                return "Faltan o sobran datos. Asegurate de enviar los 6 datos separados por comas";
+            }
+        }
+
+        if (comando.startsWith("/consultar_donaciones_id")) {
+            String[] datos = comando.split(" ",2);
+            try {
+                return donacionesClient.consultarDonacionPorID(datos[1].trim());
+            } catch (NumberFormatException e){
+                return "Comando incompleto. Usa el formato: /consultar_donacion_id [ID]";
+            }
+        }
+
+        if (comando.startsWith("/consultar_donaciones")){
+            return donacionesClient.consultarTodasLasDonaciones();
+        }
+
+        if(comando.startsWith("/modificar_estado")){
+            String datosCrudos = comando.replace("/modificar_estado", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para modificar el estado de una donacion, enviá el ID y el nuevo estado separados por coma.\n" +
+                        "Ejemplo: /modificar_estado ID, Estado";
+            }
+            String[] datos = datosCrudos.split(",",2);
+            try{
+                return donacionesClient.modificarEstado(datos[0].trim(), EstadoDonacionEnum.valueOf(datos[1].trim()));
+            } catch (NumberFormatException e) {
+                return "Comando incompleto. Usa el formato: /modificar_estado [ID]";
+            }
+        }
+
+
         return "Comando no reconocido. Usá /start para ver el menú inicial.";
     }
 

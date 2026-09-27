@@ -5,8 +5,11 @@ import ar.edu.utn.dds.k3003.catedra.dtos.donaciones.EstadoDonacionEnum;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+@Service
 public class DonacionesClient {
     private final RestClient restClient;
 
@@ -45,7 +48,7 @@ public class DonacionesClient {
         }
     }
 
-    public String consultarDonadacionPorID(String donacionID) {
+    public String consultarDonacionPorID(String donacionID) {
         try {
             String jsonCrudo = restClient.get()
                     .uri("/donaciones/{donacionID}", donacionID)
@@ -59,5 +62,19 @@ public class DonacionesClient {
         }
     }
 
+    public String modificarEstado(String donacionID, EstadoDonacionEnum estado){
+        try {
+            DonacionDTO donacion = new DonacionDTO(donacionID, null, null, null, null, null, estado);
+            restClient.patch()
+                    .uri("/donaciones/{donacionID}/estado", donacionID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(donacion)
+                    .retrieve()
+                    .toBodilessEntity();
+            return "Donacion modificada exitosamente";
+        } catch (Exception e) {
+            return "Hubo un error o el ID no existe: " + e.getMessage();
+        }
+    }
 
 }
