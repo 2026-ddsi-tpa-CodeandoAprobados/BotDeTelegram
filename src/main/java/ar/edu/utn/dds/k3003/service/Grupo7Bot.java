@@ -61,7 +61,12 @@ public class Grupo7Bot extends TelegramLongPollingBot {
 
     private String procesarComando(String comando) {
         if (comando.equals("/start")) {
-            return " Bienvenido al sistema! ¿Qué tipo de usuario sos?\nIngresá /donadores o /Admin";
+            return " Bienvenido al sistema! ¿Qué tipo de usuario sos?\n " +
+                    "/donadores\n" +
+                    "/donaciones\n" +
+                    "/logistica\n" +
+                    "/incentivos\n" +
+                    "/Admin";
         }
 
         if (comando.equals("/donadores")) {
@@ -80,7 +85,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
 
         }
 
-        if (comando.equals("/logisitica")) {
+        if (comando.equals("/logistica")) {
             return "Opciones de Logistica (Ingresá el comando para ejecutar):\n" +
                     "/" +
                     "/" +
@@ -319,6 +324,34 @@ public class Grupo7Bot extends TelegramLongPollingBot {
             }
         }
 
+        if (comando.startsWith("/crear_insignia")) {
+            String datosCrudos = comando.replace("/crear_insignia", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para crear una insignia, enviá los datos separados por coma.\n" +
+                        "Ejemplo: `/crear_insignia , , , , , `";
+            }
+            String[] datos = datosCrudos.split(",");
+
+            try {
+                return incentivosClient.crearInsignia(datos[0].trim(), datos[1].trim());
+            } catch (NumberFormatException e) {
+                return "Faltan o sobran datos. Asegurate de enviar los 2 datos separados por comas";
+            }
+        }
+
+        if (comando.startsWith("/consultar_insignia_id")) {
+            String[] datos = comando.split(" ",2);
+            try {
+                return incentivosClient.consultarInsigniaPorID(datos[1].trim());
+            } catch (NumberFormatException e){
+                return "Comando incompleto. Usa el formato: /consultar_insignia_id [ID]";
+            }
+        }
+
+        if (comando.startsWith("/consultar_insignias")){
+            return incentivosClient.consultarTodasLasInsignias();
+        }
 
         return "Comando no reconocido. Usá /start para ver el menú inicial.";
     }
