@@ -37,7 +37,7 @@ public class LogisticaClient {
     public String consultarTodosLosDepositos() {
         try {
             String jsonCrudo = restClient.get()
-                    .uri("/despositos")
+                    .uri("/depositos")
                     .retrieve()
                     .body(String.class);
             ObjectMapper mapper = new ObjectMapper();

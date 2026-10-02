@@ -95,7 +95,7 @@ public class IncentivosClient {
     public String consultarMisionPorID(String misionID) {
         try {
             String jsonCrudo = restClient.get()
-                    .uri("/mision/{misionID}", misionID)
+                    .uri("/misiones/{misionID}", misionID)
                     .retrieve()
                     .body(String.class);
             ObjectMapper mapper = new ObjectMapper();
