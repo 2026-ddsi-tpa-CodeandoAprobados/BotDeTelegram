@@ -1,8 +1,9 @@
 package ar.edu.utn.dds.k3003.service;
 
-import ar.edu.utn.dds.k3003.catedra.dtos.donaciones.EstadoDonacionEnum;
-import ar.edu.utn.dds.k3003.catedra.dtos.logistica.PaqueteDTO;
-import ar.edu.utn.dds.k3003.catedra.dtos.logistica.TipoAlgoritmoEnum;
+import ar.edu.utn.dds.k3003.catedra.dtos.donaciones.*;
+import ar.edu.utn.dds.k3003.catedra.dtos.donadoresYEntidades.*;
+import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.*;
+import ar.edu.utn.dds.k3003.catedra.dtos.logistica.*;
 import ar.edu.utn.dds.k3003.clients.DonacionesClient;
 import ar.edu.utn.dds.k3003.clients.DonadoresYEntidadesClient;
 import ar.edu.utn.dds.k3003.clients.IncentivosClient;
@@ -17,7 +18,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-import java.util.List;
 
 @Component
 public class Grupo7Bot extends TelegramLongPollingBot {
@@ -67,41 +67,40 @@ public class Grupo7Bot extends TelegramLongPollingBot {
         switch (comando) {
             case "/start" -> {
                 return "Bienvenido al sistema! ¿Qué tipo de usuario sos?\n" +
-                        "/donadores - Alta\n" +
-                        "/donaciones - Alta\n" +
-                        "/logistica - Alta\n" +
-                        "/incentivos - Alta\n" +
-                        "/Admin - Baja y Modificacion";
+                        "/donadores\n" +
+                        "/donaciones\n" +
+                        "/logistica\n" +
+                        "/incentivos\n" +
+                        "/Admin";
             }
             case "/donadores" -> {
                 return "Opciones de Donador (Ingresá el comando para ejecutar):\n" +
-                        "/registro - Registrarse\n" +
+                        "/registrar_donador - Registrar un donador\n" +
                         "/mis_estadisticas [ID] - Consultar sus estadísticas\n" +
                         "/consultar_donadores - Ver todos los donadores\n" +
                         "/consultar_donador_id [ID] - Buscar donador por ID";
             }
             case "/donaciones" -> {
                 return "Opciones de Donaciones (Ingresá el comando para ejecutar):\n" +
-                        "/registro - Registrar una donacion\n" +
                         "/consultar_donaciones - Ver todas las donaciones\n" +
                         "/consultar_donacion_id [ID] - Buscar una donacion por ID";
             }
             case "/logistica" -> {
                 return "Opciones de Logistica (Ingresá el comando para ejecutar):\n" +
                         "/crear_deposito - Crear un deposito\n" +
-                        "/consultar_depositos - Ver todas los depositos\n" +
+                        "/consultar_depositos - Ver todos los depositos\n" +
                         "/consultar_deposito_id [ID] - Buscar un deposito por ID";
             }
             case "/incentivos" -> {
                 return "Opciones de Incentivos (Ingresá el comando para ejecutar):\n" +
-                        "/crear_insignia - Crear una insignia\n" +
-                        "/consultar_insignias - Ver todas las insignias\n" +
-                        "/consultar_insignia_id - Buscar una insignia por ID";
+                        "/crear_mision - Crear una mision\n" +
+                        "/consultar_misiones - Ver todas las misiones\n" +
+                        "/consultar_mision_id [ID] - Buscar una mision por ID";
             }
             case "/Admin" -> {
-                return "Opciones de Admin (Ingresá el comando para ejecutar):\n" +
+                return "Opciones de Admin (Ingresá el comando para ejecutar):\n\n" +
 
-                        //DONADORES Y ENTIDADES
+                        "DONADORES Y ENTIDADES\n\n" +
                         "/crear_entidad - Crear una entidad\n" +
                         "/editar_entidad - Editar razon social de una entidad\n" +
                         "/consultar_entidades - Ver todas las entidades\n" +
@@ -110,25 +109,36 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                         "/borrar_necesidad [ID] - Borrar necesidad\n" +
                         "/modificar_necesidad - Modificar la cantidad objetivo de una necesidad\n" +
                         "/consultar_necesidades - Ver todas las necesidades\n" +
-                        "/consultar_necesidad [ID] - Ver todas las necesidad de un producto\n" +
+                        "/consultar_necesidad [ID] - Ver todas las necesidad de un producto\n\n" +
 
-                        //DONACIONES
+                        "DONACIONES\n\n"+
                         "/modificar_donaciones [ID] - Modificar el estado de una donacion\n" +
+                        "/crear_categoria - Crear una categoria\n" +
+                        "/consultar_categorias - Ver todas las categorias\n" +
+                        "/borrar_categoria [ID] - Borrar una categoria\n" +
+                        "/crear_identificador - Crear un identificador\n" +
+                        "/consultar_identificadores - Ver todos los identificadores\n" +
+                        "/borrar_identificador [ID] - Borrar un identificador\n\n" +
 
-                        //LOGISTICA
-                        "/modificar_algoritmo [ID] - Modificar el algoritmo de un deposito\n"
+                        "LOGISTICA\n\n" +
+                        "/modificar_algoritmo - Modificar el algoritmo de un deposito\n" +
+                        "/borrar_deposito [ID] - Borrar un deposito\n\n" +
 
-                        //INCENTIVOS
-                        ;
+                        "INCENTIVOS\n\n" +
+                        "/borrar_mision [ID] - Borrar una mision\n" +
+                        "/crear_insignia - Crear insignia\n" +
+                        "/consultar_insignias - Ver todas las insignias\n" +
+                        "/consultar_insignia_id [ID] - Buscar una insignia por ID\n" +
+                        "/borrar_insignia [ID] - Borrar una insignia";
             }
         }
-
-        if (comando.startsWith("/registro")) {
-            String datosCrudos = comando.replace("/registro", "").trim();
+//DONADORES Y ENTIDADES
+        if (comando.startsWith("/registrar_donador")) {
+            String datosCrudos = comando.replace("/registrar_donador", "").trim();
 
             if (datosCrudos.isEmpty()) {
                 return "Para registrarte, enviá tus datos separados por coma.\n" +
-                        "Ejemplo: `/registro Nombre, Apellido, Edad, Email, DNI, Domicilio`";
+                        "Ejemplo: `/registro_donador Nombre, Apellido, Edad, Email, DNI, Domicilio`";
             }
             String[] datos = datosCrudos.split(",");
 
@@ -227,8 +237,8 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                         Integer.parseInt(datos[1].trim()),
                         datos[2].trim(),
                         Integer.parseInt(datos[3].trim()),
-                        datos[4].trim());
-                        //TipoNecesidadMaterialEnum.valueOf(datos[5].trim()));
+                        datos[4].trim(),
+                        TipoNecesidadMaterialEnum.valueOf(datos[5].trim()));
             } catch (NumberFormatException e) {
                 return "Faltan o sobran datos. Asegurate de enviar los 6 datos separados por comas";
             }
@@ -271,26 +281,29 @@ public class Grupo7Bot extends TelegramLongPollingBot {
             }
         }
 
-        if (comando.startsWith("/registrar_donacion")) {
-            String datosCrudos = comando.replace("/registrar_donacion", "").trim();
+//DONACIONES
 
-            if (datosCrudos.isEmpty()) {
-                return "Para crear una donacion, enviá los datos separados por coma.\n" +
-                        "Ejemplo: `/registrar_donacion , , , , , `";
-            }
-            String[] datos = datosCrudos.split(",");
-
-            try {
-                return donacionesClient.registrarDonacion(datos[0].trim(),
-                        datos[1].trim(),
-                        datos[2].trim(),
-                        datos[3].trim(),
-                        Integer.parseInt(datos[4].trim()),
-                        EstadoDonacionEnum.valueOf(datos[5].trim()));
-            } catch (NumberFormatException e) {
-                return "Faltan o sobran datos. Asegurate de enviar los 6 datos separados por comas";
-            }
-        }
+//        if (comando.startsWith("/registrar_donacion")) {
+//            String datosCrudos = comando.replace("/registrar_donacion", "").trim();
+//
+//            if (datosCrudos.isEmpty()) {
+//                return "Para crear una donacion, enviá los datos separados por coma.\n" +
+//                        "Ejemplo: `/registrar_donacion , , , , , `";
+//            }
+//            String[] datos = datosCrudos.split(",");
+//
+//            try {
+//                return donacionesClient.registrarDonacion(datos[0].trim(),
+//                        datos[1].trim(),
+//                        datos[2].trim(),
+//                        datos[3].trim(),
+//                        Integer.parseInt(datos[4].trim()),
+//                        EstadoDonacionEnum.valueOf(datos[5].trim()));
+//
+//            } catch (NumberFormatException e) {
+//                return "Faltan o sobran datos. Asegurate de enviar los 6 datos separados por comas";
+//            }
+//        }
 
         if (comando.startsWith("/consultar_donaciones_id")) {
             String[] datos = comando.split(" ",2);
@@ -319,6 +332,72 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                 return "Comando incompleto. Usa el formato: /modificar_estado [ID]";
             }
         }
+
+        if (comando.startsWith("/crear_categoria")) {
+            String datosCrudos = comando.replace("/crar_categoria", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para crear una donacion, enviá los datos separados por coma.\n" +
+                        "Ejemplo: `/crar_categoria Nombre, Descripcion`";
+            }
+            String[] datos = datosCrudos.split(",");
+
+            try {
+                return donacionesClient.crearCategoria(datos[0].trim(),
+                        datos[1].trim(),
+                        datos[2].trim());
+
+            } catch (NumberFormatException e) {
+                return "Faltan o sobran datos. Asegurate de enviar los 2 datos separados por comas";
+            }
+        }
+
+        if (comando.startsWith("/consultar_categorias")){
+            return donacionesClient.consultarTodasLasCategorias();
+        }
+
+        if(comando.startsWith("/borrar_categoria")){
+            String[] datos = comando.split(" ",2);
+            try {
+                return donacionesClient.borrarCategoria(datos[1].trim());
+            } catch (NumberFormatException e){
+                return "Comando incompleto. Usa el formato: /borrar_categoria [ID]";
+            }
+        }
+
+        if (comando.startsWith("/crear_identificador")) {
+            String datosCrudos = comando.replace("/crear_identificador", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para crear un identificador, enviá los datos separados por coma.\n" +
+                        "Ejemplo: `/crear_identificador Descripcion, Tipo`";
+            }
+            String[] datos = datosCrudos.split(",");
+
+            try {
+                return donacionesClient.crearIdentificador(
+                        TipoIdentificadorEnum.valueOf(datos[0].trim()),
+                        datos[1].trim());
+
+            } catch (NumberFormatException e) {
+                return "Faltan o sobran datos. Asegurate de enviar los 2 datos separados por comas";
+            }
+        }
+
+        if (comando.startsWith("/consultar_identificadores")){
+            return donacionesClient.consultarTodosLosIdentificadores();
+        }
+
+        if(comando.startsWith("/borrar_identificador")){
+            String[] datos = comando.split(" ",2);
+            try {
+                return donacionesClient.borrarIdentificador(datos[1].trim());
+            } catch (NumberFormatException e){
+                return "Comando incompleto. Usa el formato: /borrar_identificador [ID]";
+            }
+        }
+
+//INCENTIVOS
 
         if (comando.startsWith("/crear_insignia")) {
             String datosCrudos = comando.replace("/crear_insignia", "").trim();
@@ -349,17 +428,70 @@ public class Grupo7Bot extends TelegramLongPollingBot {
             return incentivosClient.consultarTodasLasInsignias();
         }
 
+        if (comando.startsWith("/borrar_insignia")){
+            String[] datos = comando.split(" ",2);
+            try {
+                return incentivosClient.borrarInsignia(datos[1].trim());
+            } catch (NumberFormatException e){
+                return "Comando incompleto. Usa el formato: /borrar_insignia [ID]";
+            }
+        }
+
+        if(comando.startsWith("/crear_mision")) {
+            String datosCrudos = comando.replace("/crear_mision", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para crear una mision, enviá los datos separados por coma.\n" +
+                        "Ejemplo: `/crear_mision Nombre, InsigniaID, Categoria de Inicio, Categoria de Fin, Tipo de Mision`";
+            }
+            String[] datos = datosCrudos.split(",");
+
+            try {
+                return incentivosClient.crearMision(datos[0].trim(),
+                        datos[1].trim(),
+                        CategoriaDonadorEnum.valueOf(datos[2].trim()),
+                        CategoriaDonadorEnum.valueOf(datos[3].trim()),
+                        TipoMisionEnum.valueOf(datos[4].trim()));
+            } catch (NumberFormatException e) {
+                return "Faltan o sobran datos. Asegurate de enviar los 5 datos separados por comas";
+            }
+        }
+
+        if (comando.startsWith("/consultar_mision_id")) {
+            String[] datos = comando.split(" ",2);
+            try {
+                return incentivosClient.consultarMisionPorID(datos[1].trim());
+            } catch (NumberFormatException e){
+                return "Comando incompleto. Usa el formato: /consultar_mision_id [ID]";
+            }
+        }
+
+        if (comando.startsWith("/consultar_misiones")){
+            return incentivosClient.consultarTodasLasMisiones();
+        }
+
+        if (comando.startsWith("/borrar_mision")){
+            String[] datos = comando.split(" ",2);
+            try {
+                return incentivosClient.borrarMision(datos[1].trim());
+            } catch (NumberFormatException e){
+                return "Comando incompleto. Usa el formato: /borrar_mision [ID]";
+            }
+        }
+
+//LOGISTICA
+
         if (comando.startsWith("/crear_deposito")) {
             String datosCrudos = comando.replace("/crear_deposito", "").trim();
 
             if (datosCrudos.isEmpty()) {
                 return "Para crear un deposti, enviá los datos separados por coma.\n" +
-                        "Ejemplo: `/crear_deposito , , , , , `";
+                        "Ejemplo: `/crear_deposito Nombre, Direccion, Capacidad Maxima`";
             }
             String[] datos = datosCrudos.split(",");
 
             try {
-                return logisticaClient.crearDeposito(TipoAlgoritmoEnum.valueOf(datos[0].trim()),
+                return logisticaClient.crearDeposito(
                         datos[1].trim(),
                         datos[2].trim(),
                         Integer.parseInt(datos[3].trim())
@@ -396,6 +528,16 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                 return "Comando incompleto. Usa el formato: /modificar_algoritmo [ID]";
             }
         }
+
+        if (comando.startsWith("/borrar_deposito")){
+            String[] datos = comando.split(" ",2);
+            try {
+                return logisticaClient.borrarDeposito(datos[1].trim());
+            } catch (NumberFormatException e){
+                return "Comando incompleto. Usa el formato: /borrar_deposito [ID]";
+            }
+        }
+
 
         return "Comando no reconocido. Usá /start para ver el menú inicial.";
     }

@@ -1,7 +1,6 @@
 package ar.edu.utn.dds.k3003.clients;
 
-import ar.edu.utn.dds.k3003.catedra.dtos.donaciones.DonacionDTO;
-import ar.edu.utn.dds.k3003.catedra.dtos.donaciones.EstadoDonacionEnum;
+import ar.edu.utn.dds.k3003.catedra.dtos.donaciones.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,4 +76,85 @@ public class DonacionesClient {
         }
     }
 
+    public String crearCategoria(String nombre, String descripcion, String subcategoriaID) {
+        try {
+            CategoriaDTO categoria = new CategoriaDTO(null, nombre, descripcion, subcategoriaID);
+            restClient.post()
+                    .uri("/categorias")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(categoria)
+                    .retrieve()
+                    .toBodilessEntity();
+            return "Categoria creada correctamente";
+        } catch (Exception e) {
+            return "Hubo un error al crear la categoria: " + e.getMessage();
+        }
+    }
+
+    public String consultarTodasLasCategorias() {
+        try {
+            String jsonCrudo = restClient.get()
+                    .uri("/categorias")
+                    .retrieve()
+                    .body(String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(jsonCrudo);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+        } catch (Exception e) {
+            return "Hubo un error al conectar con la API: " + e.getMessage();
+        }
+    }
+
+    public String borrarCategoria(String categoriaID) {
+        try {
+            restClient.delete()
+                    .uri("/categorias/{categoriaID}", categoriaID)
+                    .retrieve()
+                    .toBodilessEntity();
+            return "Categoria borrada exitosamente";
+        } catch (Exception e) {
+            return "Hubo un error o el ID no existe: " + e.getMessage();
+        }
+    }
+
+    public String crearIdentificador(TipoIdentificadorEnum tipo, String descripcion) {
+        try {
+            IdentificadorDTO identificador = new IdentificadorDTO(null, tipo, descripcion);
+            restClient.post()
+                    .uri("/identificadores")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(identificador)
+                    .retrieve()
+                    .toBodilessEntity();
+            return "Identificador creado correctamente";
+        } catch (Exception e) {
+            return "Hubo un error al crear la categoria: " + e.getMessage();
+        }
+    }
+
+    public String consultarTodosLosIdentificadores() {
+        try {
+            String jsonCrudo = restClient.get()
+                    .uri("/identificadores")
+                    .retrieve()
+                    .body(String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(jsonCrudo);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+        } catch (Exception e) {
+            return "Hubo un error al conectar con la API: " + e.getMessage();
+        }
+    }
+
+    public String borrarIdentificador(String identificadorID) {
+        try {
+            restClient.delete()
+                    .uri("/identificadores/{identificadorID}", identificadorID)
+                    .retrieve()
+                    .toBodilessEntity();
+            return "Identificador borrado exitosamente";
+        } catch (Exception e) {
+            return "Hubo un error o el ID no existe: " + e.getMessage();
+        }
+    }
 }

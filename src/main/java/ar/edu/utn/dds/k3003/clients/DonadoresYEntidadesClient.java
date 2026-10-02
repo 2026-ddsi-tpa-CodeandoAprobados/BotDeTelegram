@@ -165,9 +165,9 @@ public class DonadoresYEntidadesClient {
         }
     }
 
-    public String altaNecesidad(String entidadID, Integer nivelDeUrgencia, String descripcion, Integer cantidadObjetivo, String productoSolicitadoID){
+    public String altaNecesidad(String entidadID, Integer nivelDeUrgencia, String descripcion, Integer cantidadObjetivo, String productoSolicitadoID, TipoNecesidadMaterialEnum tipo){
         try{
-            NecesidadMaterialDTO necesidadMaterial = new NecesidadMaterialDTO(null,entidadID,nivelDeUrgencia,descripcion,cantidadObjetivo,productoSolicitadoID,TipoNecesidadMaterialEnum.RECURRENTE);
+            NecesidadMaterialDTO necesidadMaterial = new NecesidadMaterialDTO(null,entidadID,nivelDeUrgencia,descripcion,cantidadObjetivo,productoSolicitadoID, tipo);
             restClient.post()
                     .uri("/necesidades")
                     .contentType(MediaType.APPLICATION_JSON)

@@ -1,10 +1,6 @@
 package ar.edu.utn.dds.k3003.clients;
 
-import ar.edu.utn.dds.k3003.catedra.dtos.donaciones.DonacionDTO;
-import ar.edu.utn.dds.k3003.catedra.dtos.donaciones.EstadoDonacionEnum;
-import ar.edu.utn.dds.k3003.catedra.dtos.incentivos.InsigniaDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.logistica.DepositoDTO;
-import ar.edu.utn.dds.k3003.catedra.dtos.logistica.PaqueteDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.logistica.TipoAlgoritmoEnum;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-
-import java.util.List;
 
 @Service
 public class LogisticaClient {
@@ -25,9 +19,9 @@ public class LogisticaClient {
                 .build();
     }
 
-    public String crearDeposito(TipoAlgoritmoEnum algoritmo, String nombre, String descripcion, Integer capacidadMaxima) {
+    public String crearDeposito(String nombre, String descripcion, Integer capacidadMaxima) {
         try {
-            DepositoDTO deposito = new DepositoDTO(null, algoritmo, descripcion, nombre, capacidadMaxima, null);
+            DepositoDTO deposito = new DepositoDTO(null, null, descripcion, nombre, capacidadMaxima, null);
             restClient.post()
                     .uri("/depositos")
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
@@ -68,7 +62,19 @@ public class LogisticaClient {
         }
     }
 
-        public String modificarAlgoritmo(String depositoID, TipoAlgoritmoEnum algoritmo){
+    public String borrarDeposito(String depositoID) {
+        try {
+            restClient.delete()
+                    .uri("/depositos/{depositoID}", depositoID)
+                    .retrieve()
+                    .toBodilessEntity();
+            return "Deposito borrado exitosamente";
+        } catch (Exception e) {
+            return "Hubo un error o el ID no existe: " + e.getMessage();
+        }
+    }
+
+    public String modificarAlgoritmo(String depositoID, TipoAlgoritmoEnum algoritmo){
             try {
                 DepositoDTO deposito = new DepositoDTO(depositoID, algoritmo, null, null, null, null);
                 restClient.patch()
@@ -77,11 +83,9 @@ public class LogisticaClient {
                         .body(deposito)
                         .retrieve()
                         .toBodilessEntity();
-                return "Deposito modificada exitosamente";
+                return "Deposito modificado exitosamente";
             } catch (Exception e) {
                 return "Hubo un error o el ID no existe: " + e.getMessage();
             }
         }
-
-
 }
