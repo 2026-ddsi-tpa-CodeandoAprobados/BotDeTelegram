@@ -19,9 +19,16 @@ public class DonadoresYEntidadesClient {
                 .build();
     }
 
-    public String registrarDonador(String nombre, String apellido, Integer edad, String email, String nroDocumento, String domicilio) {
+    public String registrarDonador(String nombre,
+                                   String apellido,
+                                   Integer edad,
+                                   String email,
+                                   String nroDocumento,
+                                   String domicilio,
+                                   EstadoDonadorEnum estado,
+                                   String categoria) {
         try {
-        DonadorDTO donador = new DonadorDTO(null, nombre, apellido, edad, email, nroDocumento, domicilio, EstadoDonadorEnum.VERIFICADO, "Ocasional");
+        DonadorDTO donador = new DonadorDTO(null, nombre, apellido, edad, email, nroDocumento, domicilio, estado, categoria);
         restClient.post()
                 .uri("/donadores")
                 .contentType(org.springframework.http.MediaType.APPLICATION_JSON)

@@ -144,7 +144,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
 
             if (datosCrudos.isEmpty()) {
                 return "Para registrarte, enviá tus datos separados por coma.\n" +
-                        "Ejemplo: `/registro_donador Nombre, Apellido, Edad, Email, DNI, Domicilio`";
+                        "Ejemplo: `/registrar_donador Nombre, Apellido, Edad, Email, DNI, Domicilio, Estado, Categoria`";
             }
             String[] datos = datosCrudos.split(",");
 
@@ -154,9 +154,11 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                             Integer.parseInt(datos[2].trim()),
                             datos[3].trim(),
                             datos[4].trim(),
-                            datos[5].trim());
+                            datos[5].trim(),
+                            EstadoDonadorEnum.valueOf(datos[6].trim()),
+                            datos[7].trim());
                 } catch (NumberFormatException e) {
-                    return "Faltan o sobran datos. Asegurate de enviar los 6 datos separados por comas";
+                    return "Faltan o sobran datos. Asegurate de enviar los 8 datos separados por comas";
                 }
         }
 
