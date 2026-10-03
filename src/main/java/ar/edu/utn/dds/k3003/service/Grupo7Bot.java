@@ -82,6 +82,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
             }
             case "/donaciones" -> {
                 return "Opciones de Donaciones (Ingresá el comando para ejecutar):\n" +
+                        "/registrar_donacion - Registrar una donacion\n" +
                         "/consultar_donaciones - Ver todas las donaciones\n" +
                         "/consultar_donacion_id [ID] - Buscar una donacion por ID";
             }
