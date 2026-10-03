@@ -234,7 +234,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                 return "Para dar de alta una necesidad, enviá los datos separados por coma.\n" +
                         "Ejemplo: /alta_necesidad EntidadID, Nivel de urgencia, Descripcion, Cantidad objetivo, ProductoSolicitadoID, Tipo de necesidad";
             }
-            String[] datos = datosCrudos.split(",",5);
+            String[] datos = datosCrudos.split(",",6);
 
             try {
                 return donadoresYEntidadesClient.altaNecesidad(
@@ -310,7 +310,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
             }
         }
 
-        if (comando.startsWith("/consultar_donaciones_id")) {
+        if (comando.startsWith("/consultar_donacion_id")) {
             String[] datos = comando.split(" ",2);
             try {
                 return donacionesClient.consultarDonacionPorID(datos[1].trim());
@@ -339,7 +339,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
         }
 
         if (comando.startsWith("/crear_categoria")) {
-            String datosCrudos = comando.replace("/crar_categoria", "").trim();
+            String datosCrudos = comando.replace("/crear_categoria", "").trim();
 
             if (datosCrudos.isEmpty()) {
                 return "Para crear una donacion, enviá los datos separados por coma.\n" +
@@ -409,7 +409,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
 
             if (datosCrudos.isEmpty()) {
                 return "Para crear una insignia, enviá los datos separados por coma.\n" +
-                        "Ejemplo: `/crear_insignia , , , , , `";
+                        "Ejemplo: `/crear_insignia Nombre, Descripcion`";
             }
             String[] datos = datosCrudos.split(",");
 
@@ -526,7 +526,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                 return "Para modificar el algoritmo de un deposito, enviá el ID y el nuevo algoritmo separados por coma.\n" +
                         "Ejemplo: /modificar_algoritmo ID, Algoritmo";
             }
-            String[] datos = datosCrudos.split(",",2);
+            String[] datos = datosCrudos.split(",",4);
             try{
                 return logisticaClient.modificarAlgoritmo(datos[0].trim(), TipoAlgoritmoEnum.valueOf(datos[1].trim()));
             } catch (NumberFormatException e) {
