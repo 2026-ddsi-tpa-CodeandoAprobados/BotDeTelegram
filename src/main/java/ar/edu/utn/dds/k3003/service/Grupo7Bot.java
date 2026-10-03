@@ -112,7 +112,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
                         "/consultar_necesidad [ID] - Ver todas las necesidad de un producto\n\n" +
 
                         "DONACIONES\n\n"+
-                        "/modificar_donaciones [ID] - Modificar el estado de una donacion\n" +
+                        "/modificar_estado - Modificar el estado de una donacion\n" +
                         "/crear_categoria - Crear una categoria\n" +
                         "/consultar_categorias - Ver todas las categorias\n" +
                         "/borrar_categoria [ID] - Borrar una categoria\n" +
@@ -122,7 +122,12 @@ public class Grupo7Bot extends TelegramLongPollingBot {
 
                         "LOGISTICA\n\n" +
                         "/modificar_algoritmo - Modificar el algoritmo de un deposito\n" +
-                        "/borrar_deposito [ID] - Borrar un deposito\n\n" +
+                        "/modificar_deposito - Modifica nombre, direccion y cantidad maxima de un deposito\n" +
+                        "/borrar_deposito [ID] - Borrar un deposito\n" +
+                        "/consultar_stock [ID] - Ver el stock disponible de un produto\n" +
+                        "/consultar_asignaciones - Ver todas las asignaciones\n" +
+                        "/consultar_asignacion_id - Buscar una asignacion por ID\n" +
+                        "/consultar_paquetes - Ver todos los paquetes\n\n" +
 
                         "INCENTIVOS\n\n" +
                         "/borrar_mision [ID] - Borrar una mision\n" +
@@ -283,27 +288,27 @@ public class Grupo7Bot extends TelegramLongPollingBot {
 
 //DONACIONES
 
-//        if (comando.startsWith("/registrar_donacion")) {
-//            String datosCrudos = comando.replace("/registrar_donacion", "").trim();
-//
-//            if (datosCrudos.isEmpty()) {
-//                return "Para crear una donacion, enviá los datos separados por coma.\n" +
-//                        "Ejemplo: `/registrar_donacion , , , , , `";
-//            }
-//            String[] datos = datosCrudos.split(",");
-//
-//            try {
-//                return donacionesClient.registrarDonacion(datos[0].trim(),
-//                        datos[1].trim(),
-//                        datos[2].trim(),
-//                        datos[3].trim(),
-//                        Integer.parseInt(datos[4].trim()),
-//                        EstadoDonacionEnum.valueOf(datos[5].trim()));
-//
-//            } catch (NumberFormatException e) {
-//                return "Faltan o sobran datos. Asegurate de enviar los 6 datos separados por comas";
-//            }
-//        }
+        if (comando.startsWith("/registrar_donacion")) {
+            String datosCrudos = comando.replace("/registrar_donacion", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para crear una donacion, enviá los datos separados por coma.\n" +
+                        "Ejemplo: `/registrar_donacion DonadorID, DepositoID, Descripcion, ProductoID, Cantidad, Estado de una Donacion`";
+            }
+            String[] datos = datosCrudos.split(",");
+
+            try {
+                return donacionesClient.registrarDonacion(datos[0].trim(),
+                        datos[1].trim(),
+                        datos[2].trim(),
+                        datos[3].trim(),
+                        Integer.parseInt(datos[4].trim()),
+                        EstadoDonacionEnum.valueOf(datos[5].trim()));
+
+            } catch (NumberFormatException e) {
+                return "Faltan o sobran datos. Asegurate de enviar los 6 datos separados por comas";
+            }
+        }
 
         if (comando.startsWith("/consultar_donaciones_id")) {
             String[] datos = comando.split(" ",2);
@@ -329,7 +334,7 @@ public class Grupo7Bot extends TelegramLongPollingBot {
             try{
                 return donacionesClient.modificarEstado(datos[0].trim(), EstadoDonacionEnum.valueOf(datos[1].trim()));
             } catch (NumberFormatException e) {
-                return "Comando incompleto. Usa el formato: /modificar_estado [ID]";
+                return "Comando incompleto. Usa el formato: /modificar_estado";
             }
         }
 
@@ -485,16 +490,16 @@ public class Grupo7Bot extends TelegramLongPollingBot {
             String datosCrudos = comando.replace("/crear_deposito", "").trim();
 
             if (datosCrudos.isEmpty()) {
-                return "Para crear un deposti, enviá los datos separados por coma.\n" +
+                return "Para crear un deposito, enviá los datos separados por coma.\n" +
                         "Ejemplo: `/crear_deposito Nombre, Direccion, Capacidad Maxima`";
             }
             String[] datos = datosCrudos.split(",");
 
             try {
                 return logisticaClient.crearDeposito(
+                        datos[0].trim(),
                         datos[1].trim(),
-                        datos[2].trim(),
-                        Integer.parseInt(datos[3].trim())
+                        Integer.parseInt(datos[2].trim())
                 );
             } catch (NumberFormatException e) {
                 return "Faltan o sobran datos. Asegurate de enviar los 4 datos separados por comas";
@@ -529,6 +534,21 @@ public class Grupo7Bot extends TelegramLongPollingBot {
             }
         }
 
+        if(comando.startsWith("/modificar_deposito")){
+            String datosCrudos = comando.replace("/modificar_deposito", "").trim();
+
+            if (datosCrudos.isEmpty()) {
+                return "Para modificar un deposito, enviá el ID y el nuevo nombre, direccion o capacidad maxima separados por coma.\n" +
+                        "Ejemplo: /modificar_deposito ID, Nombre, Direccion, Capacidad maxima";
+            }
+            String[] datos = datosCrudos.split(",",2);
+            try{
+                return logisticaClient.modificarDesposito(datos[0].trim(), datos[1].trim(), datos[2].trim(), Integer.parseInt(datos[3].trim()));
+            } catch (NumberFormatException e) {
+                return "Comando incompleto. Usa el formato: /modificar_deposito";
+            }
+        }
+
         if (comando.startsWith("/borrar_deposito")){
             String[] datos = comando.split(" ",2);
             try {
@@ -538,6 +558,31 @@ public class Grupo7Bot extends TelegramLongPollingBot {
             }
         }
 
+        if (comando.startsWith("/consultar_stock")) {
+            String[] datos = comando.split(" ",2);
+            try {
+                return logisticaClient.consultarStockPorID(datos[1].trim());
+            } catch (NumberFormatException e){
+                return "Comando incompleto. Usa el formato: /consultar_stock [ID]";
+            }
+        }
+
+        if (comando.startsWith("/consultar_asignaciones")){
+            return logisticaClient.consultarTodasLasAsignaciones();
+        }
+
+        if (comando.startsWith("/consultar_asignacion_id")) {
+            String[] datos = comando.split(" ",2);
+            try {
+                return logisticaClient.consultarAsignacionPorID(datos[1].trim());
+            } catch (NumberFormatException e){
+                return "Comando incompleto. Usa el formato: /consultar_asignacion_id [ID]";
+            }
+        }
+
+        if (comando.startsWith("/consultar_paquetes")){
+            return logisticaClient.consultarTodosLosPaquetes();
+        }
 
         return "Comando no reconocido. Usá /start para ver el menú inicial.";
     }

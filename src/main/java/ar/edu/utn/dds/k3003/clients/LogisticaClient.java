@@ -1,5 +1,6 @@
 package ar.edu.utn.dds.k3003.clients;
 
+import ar.edu.utn.dds.k3003.catedra.dtos.logistica.AsignacionDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.logistica.DepositoDTO;
 import ar.edu.utn.dds.k3003.catedra.dtos.logistica.TipoAlgoritmoEnum;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -87,5 +88,76 @@ public class LogisticaClient {
             } catch (Exception e) {
                 return "Hubo un error o el ID no existe: " + e.getMessage();
             }
+    }
+
+    public String modificarDesposito(String depositoID, String nombre, String direccion, Integer capacidadMaxima){
+        try {
+            DepositoDTO deposito = new DepositoDTO(depositoID, null, nombre, direccion, capacidadMaxima, null);
+            restClient.put()
+                    .uri("/depositos/{depositoID}", depositoID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(deposito)
+                    .retrieve()
+                    .toBodilessEntity();
+            return "Deposito modificado exitosamente";
+        } catch (Exception e) {
+            return "Hubo un error o el ID no existe: " + e.getMessage();
         }
+    }
+
+    public String consultarStockPorID(String productoID) {
+        try {
+            String jsonCrudo = restClient.get()
+                    .uri("/stock/{productoID}", productoID)
+                    .retrieve()
+                    .body(String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(jsonCrudo);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+        } catch (Exception e) {
+            return "Hubo un error o el ID no existe: " + e.getMessage();
+        }
+    }
+
+    public String consultarAsignacionPorID(String asignacionID) {
+        try {
+            String jsonCrudo = restClient.get()
+                    .uri("/asignaciones/{asignacionID}", asignacionID)
+                    .retrieve()
+                    .body(String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(jsonCrudo);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+        } catch (Exception e) {
+            return "Hubo un error o el ID no existe: " + e.getMessage();
+        }
+    }
+
+    public String consultarTodasLasAsignaciones() {
+        try {
+            String jsonCrudo = restClient.get()
+                    .uri("/asignaciones")
+                    .retrieve()
+                    .body(String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(jsonCrudo);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+        } catch (Exception e) {
+            return "Hubo un error al conectar con la API: " + e.getMessage();
+        }
+    }
+
+    public String consultarTodosLosPaquetes() {
+        try {
+            String jsonCrudo = restClient.get()
+                    .uri("/paquetes")
+                    .retrieve()
+                    .body(String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(jsonCrudo);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+        } catch (Exception e) {
+            return "Hubo un error al conectar con la API: " + e.getMessage();
+        }
+    }
 }
